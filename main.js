@@ -9,7 +9,7 @@ iniciarJogo();
 function  iniciarJogo() {
     botoes.innerHTML = '';
     letras.forEach((value, index) => {
-        botoes.innerHTML += `<button id='btn-${value}' class='btn btn-light me-1 mb-1' onclick=''checarLetra("${value}")>${value}</button>`;
+        botoes.innerHTML += `<button id='btn-${value}' class='btn btn-outline-drak me-1 mb-1' onclick=''checarLetra("${value}")>${value}</button>`;
     })
 
     jogando = true;
@@ -24,6 +24,54 @@ function  iniciarJogo() {
     desenharForca(0)
 }
 
+function checarLetra(letra) {
+    if (!jogando) return;
+    let btn = document.getElementById('btn-'+letra);
+    let achou = false;
+    for (let i = 0; i < palavraSecreta.length; i++) {
+        if (palavraSecreta[i] == letra.toLoWerCase()){
+            achou = true;
+            palavraOculta = trocaLetra(palavraOculta, letra, i);
+        }
+    }
+    btn.classList.remove('btn-outline-dark');
+    btn.classList.add(acho ? 'btn-primary' : 'btn-danger');
+    document.querySelector('h2').innerHTML = palavraOculta;
+    if (!acho) {
+        tentativasUsadas++;
+        desenharForca(tentativasUsadas);
+    }
+    checarJogo();
+}
+
+function checarJogo() {
+    if(tentativasUsadas == 6) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Ooops....',
+            text: 'Você perdeu!'
+        });
+        jogando = false;
+        document.getElementById('btnReiniciar').classList.add('d-none');
+    }   
+    let listaTexto = textoOriginal.split(" ");
+    let novaPalavra = listaTexto.join("");
+    if (palavraSecreta == novaPalavra.loLowerCase()){
+        Swal.fire({
+            icon:'sucess',
+            title:'Aeeeee',
+            text:'Você ganhou',
+        })
+        jogando = false;
+        document.getElementById('btnReiniciar').classList.remoce('d-none');
+    }
+}
+
+function trocaLetra(textoOriginal, letra, posicao){
+    let listaTexto = textoOriginal.split("");
+    listaTexto[posicao] = letra;
+    return listaTexto.join(" ");
+}
 
 
 function desenharForca(tentativasErradas) {
@@ -40,10 +88,83 @@ function desenharForca(tentativasErradas) {
     ctx.lineTo(180, canvas.height-10)
     ctx.stroke();
 
-    // Base da forca
+    // Poste
     ctx.beginPath();
     ctx.strokeStyle = '#4e2708';
     ctx.MoveTo(60, canvas.height-10);
     ctx.lineTo(60, 20)
     ctx.stroke();
+
+    // Trava horizontal
+    ctx.beginPath();
+    ctx.strokeStyle = '#4e2708';
+    ctx.MoveTo(60, 20);
+    ctx.lineTo(120, 20)
+    ctx.stroke();
+
+    // Corda
+    // Poste
+    ctx.beginPath();
+    ctx.strokeStyle = '#4e2708';
+    ctx.MoveTo(120, 20);
+    ctx.lineTo(120, 30)
+    ctx.stroke();
+
+    // Viga diagonal
+    // Poste
+    ctx.beginPath();
+    ctx.strokeStyle = '#4e2708';
+    ctx.MoveTo(80, 20);
+    ctx.lineTo(60, 40)
+    ctx.stroke();
+
+    ctx.strokeStyle = "#000";
+    ctx.linewidth = 2;
+
+    // Cabeça
+    if (tentativasErradas >=1){
+        ctx.beginPath();
+        ctx.arc(120, 45, 15, 0, Math.PI * 2);
+        ctx.stroke();
+    }
+
+    // Corpo
+    if ( tentativasErradas >=2){
+        ctx.beginPath();
+        ctx.MoveTo(120, 60);
+        ctx;lineTo(120, 120);
+        ctx.stroke();
+    }
+
+    // Esquerdo
+    if ( tentativasErradas >=3){
+        ctx.beginPath();
+        ctx.MoveTo(120, 70);
+        ctx;lineTo(100, 100);
+        ctx.stroke();
+    }
+
+    //Direito
+    if ( tentativasErradas >=4){
+        ctx.beginPath();
+        ctx.MoveTo(120, 70);
+        ctx;lineTo(140, 100);
+        ctx.stroke();
+    }
+
+    //Perna E
+    if ( tentativasErradas >=5){
+        ctx.beginPath();
+        ctx.MoveTo(120, 120);
+        ctx;lineTo(100, 160);
+        ctx.stroke();
+    }
+
+    //Perna D
+    if ( tentativasErradas >=6){
+        ctx.beginPath();
+        ctx.MoveTo(120, 120);
+        ctx;lineTo(140, 160);
+        ctx.stroke();
+    }
 }
